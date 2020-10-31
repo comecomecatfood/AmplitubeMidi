@@ -1,3 +1,6 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-`
+
 import time
 from rtmidi.midiutil import open_midioutput
 from rtmidi.midiconstants import (
@@ -17,6 +20,7 @@ class FootController(object):
             'led': LED(17),
             # value 100 is off
             'value': 100,
+            'sig': 0x52,
         }
 
         self.ts = {
@@ -31,17 +35,19 @@ class FootController(object):
             'value': 100,
         }
 
+        self.bunk = {
+            'value': 0,
+            '1bit_led': LED(24),
+        }
+
         self.right_button = Button(13)
-        self.right_button.when_pressed = self.moller_change
-
+        self.right_button.when_pressed = self.right_button_push
         self.center_button = Button(19)
-        self.center_button.when_pressed = self.ts_change
-
+        self.center_button.when_pressed = self.center_button_push
         self.left_button = Button(26)
-        self.left_button.when_pressed = self.delay_change
+        self.left_button.when_pressed = self.left_button_push
 
         self.other_button = Button(23)
-        self.other_button.when_pressed = self.delay_change
 
         self.power_led.on()
 
@@ -78,8 +84,20 @@ class FootController(object):
             self.moller['led'].off()
             self.moller['value'] = 100
             print('Moller OFF')
-        controller_change = [CONTROLLER_CHANGE, 0x52, self.moller['value']]
+        controller_change = [CONTROLLER_CHANGE, self.moller['sig'], self.moller['value']]
         midiout.send_message(controller_change)
+
+    def right_button_push(self):
+        if self.bunk['value'] == 0:
+            self.moller_change()
+
+    def center_button_push(self):
+        if self.bunk['value'] == 0:
+            self.ts_change()
+
+    def left_button_push(self):
+        if self.bunk['value'] == 0:
+            self.delay_change()
 
 
 foot_controller = FootController()
