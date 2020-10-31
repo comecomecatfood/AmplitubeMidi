@@ -12,29 +12,36 @@ midiout, port_name = open_midioutput(1)
 class FootController(object):
     def __init__(self):
         self.power_led = LED(6)
-        self.ts = {
+
+        self.moller = {
             'led': LED(17),
             # value 100 is off
             'value': 100,
         }
-        self.ts_button = Button(13)
-        self.ts_button.when_pressed = self.ts_change
 
-        self.delay = {
+        self.ts = {
             'led': LED(27),
             # value 100 is off
             'value': 100,
         }
-        self.delay_button = Button(19)
-        self.delay_button.when_pressed = self.delay_change
 
-        self.num3 = {
+        self.delay = {
             'led': LED(22),
             # value 100 is off
             'value': 100,
         }
-        self.num3_button = Button(26)
-        self.num3_button.when_pressed = self.num3_change
+
+        self.right_button = Button(13)
+        self.right_button.when_pressed = self.moller_change
+
+        self.center_button = Button(19)
+        self.center_button.when_pressed = self.ts_change
+
+        self.left_button = Button(26)
+        self.left_button.when_pressed = self.delay_change
+
+        self.other_button = Button(23)
+        self.other_button.when_pressed = self.delay_change
 
         self.power_led.on()
 
@@ -62,16 +69,16 @@ class FootController(object):
         controller_change = [CONTROLLER_CHANGE, 0x51, self.delay['value']]
         midiout.send_message(controller_change)
 
-    def num3_change(self):
-        if self.num3['value'] == 100:
-            self.num3['led'].on()
-            self.num3['value'] = 0
-            print('num3 ON')
+    def moller_change(self):
+        if self.moller['value'] == 100:
+            self.moller['led'].on()
+            self.moller['value'] = 0
+            print('Moller ON')
         else:
-            self.num3['led'].off()
-            self.num3['value'] = 100
-            print('Num3 OFF')
-        controller_change = [CONTROLLER_CHANGE, 0x52, self.num3['value']]
+            self.moller['led'].off()
+            self.moller['value'] = 100
+            print('Moller OFF')
+        controller_change = [CONTROLLER_CHANGE, 0x52, self.moller['value']]
         midiout.send_message(controller_change)
 
 
