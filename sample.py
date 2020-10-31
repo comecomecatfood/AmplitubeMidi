@@ -15,30 +15,41 @@ midiout, port_name = open_midioutput(1)
 class FootController(object):
     def __init__(self):
         self.power_led = LED(6)
+        green_led = LED(17)
+        blue_led = LED(27)
+        yellow_led = LED(22)
+        red_led = LED(24)
 
         self.moller = {
-            'led': LED(17),
+            'led': green_led,
             # value 100 is off
             'value': 100,
             'sig': 0x52,
         }
 
         self.ts = {
-            'led': LED(27),
+            'led': blue_led,
             # value 100 is off
             'value': 100,
         }
 
         self.delay = {
-            'led': LED(22),
+            'led': yellow_led,
             # value 100 is off
             'value': 100,
         }
 
         self.bunk = {
             'value': 0,
-            '1bit_led': LED(24),
         }
+
+        self.amp = {
+            'jcm900': {
+                'led': red_led,
+                'sig': 0x53
+            }
+        }
+        self.amp['jcm900']['led'].on()
 
         self.right_button = Button(13)
         self.right_button.when_pressed = self.right_button_push
@@ -48,6 +59,7 @@ class FootController(object):
         self.left_button.when_pressed = self.left_button_push
 
         self.other_button = Button(23)
+        self.other_button.when_pressed = self.change_bunk
 
         self.power_led.on()
 
@@ -98,6 +110,17 @@ class FootController(object):
     def left_button_push(self):
         if self.bunk['value'] == 0:
             self.delay_change()
+
+    def change_bunk(self):
+        if self.bunk['value'] == 8:
+            self.bunk['value'] = 0
+        else:
+            self.bunk['value'] += 1
+        print('Bunk Change: Number {}'.format(self.bunk['value']))
+
+        if self.bunk['value'] == 0:
+            # JCM 900 MOLLER/OFF TS/OFF DELAY/OFF
+            pass
 
 
 foot_controller = FootController()
