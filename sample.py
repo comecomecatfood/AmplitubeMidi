@@ -120,6 +120,7 @@ class FootController(object):
             self.ts_change('off')
             self.delay_change('off')
             print('Mute ON')
+            self.bunk_status()
         else:
             self.mute['value'] = 100
             print('Mute OFF')
@@ -151,20 +152,52 @@ class FootController(object):
 
     def left_button_push(self):
         if self.mute['value'] == 0:
+            self.change_bunk()
             return
         if self.bunk['value'] == 0:
             self.delay_change()
 
     def change_bunk(self):
-        if self.bunk['value'] == 8:
+        if self.bunk['value'] == 7:
             self.bunk['value'] = 0
         else:
             self.bunk['value'] += 1
         print('Bunk Change: Number {}'.format(self.bunk['value']))
+        self.bunk_status()
 
+    def bunk_status(self):
         if self.bunk['value'] == 0:
-            # JCM 900 MOLLER/OFF TS/OFF DELAY/OFF
-            pass
+            self.green_led.off()
+            self.blue_led.off()
+            self.yellow_led.off()
+        elif self.bunk['value'] == 1:
+            self.green_led.on()
+            self.blue_led.off()
+            self.yellow_led.off()
+        elif self.bunk['value'] == 2:
+            self.green_led.off()
+            self.blue_led.on()
+            self.yellow_led.off()
+        elif self.bunk['value'] == 3:
+            self.green_led.on()
+            self.blue_led.on()
+            self.yellow_led.off()
+        elif self.bunk['value'] == 4:
+            self.green_led.off()
+            self.blue_led.off()
+            self.yellow_led.on()
+        elif self.bunk['value'] == 5:
+            self.green_led.on()
+            self.blue_led.off()
+            self.yellow_led.on()
+        elif self.bunk['value'] == 6:
+            self.green_led.off()
+            self.blue_led.on()
+            self.yellow_led.on()
+        elif self.bunk['value'] == 7:
+            self.green_led.on()
+            self.blue_led.on()
+            self.yellow_led.on()
 
 
 foot_controller = FootController()
