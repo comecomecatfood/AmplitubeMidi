@@ -77,7 +77,15 @@ class FootController(object):
         self.power_led.on()
 
     def ts_change(self, on_off=''):
-        if on_off != 'off' and self.ts['value'] == 100:
+        if on_off == '' and self.ts['value'] == 100:
+            self.ts['led'].on()
+            self.ts['value'] = 0
+            print('TS ON')
+        elif on_off == '' and self.ts['value'] == 0:
+            self.ts['led'].off()
+            self.ts['value'] = 100
+            print('TS OFF')
+        elif on_off == 'on':
             self.ts['led'].on()
             self.ts['value'] = 0
             print('TS ON')
@@ -89,7 +97,15 @@ class FootController(object):
         midiout.send_message(controller_change)
 
     def delay_change(self, on_off=''):
-        if on_off != 'off' and self.delay['value'] == 100:
+        if on_off == '' and self.delay['value'] == 100:
+            self.delay['led'].on()
+            self.delay['value'] = 0
+            print('Delay ON')
+        elif on_off == '' and self.delay['value'] == 0:
+            self.delay['led'].off()
+            self.delay['value'] = 100
+            print('Delay OFF')
+        elif on_off == 'on':
             self.delay['led'].on()
             self.delay['value'] = 0
             print('Delay ON')
@@ -124,7 +140,7 @@ class FootController(object):
         else:
             self.mute['value'] = 100
             print('Mute OFF')
-            if self.bunk['value'] == 0:
+            if self.bunk['value'] in [0, 1]:
                 self.moller_change('off')
                 self.ts_change('off')
                 self.delay_change('off')
@@ -143,12 +159,18 @@ class FootController(object):
             return
         if self.bunk['value'] == 0:
             self.moller_change()
+        elif self.bunk['value'] == 1:
+            self.ts_change('off')
+            self.delay_change('off')
 
     def center_button_push(self):
         if self.mute['value'] == 0:
             return
         if self.bunk['value'] == 0:
             self.ts_change()
+        elif self.bunk['value'] == 1:
+            self.ts_change('on')
+            self.delay_change('off')
 
     def left_button_push(self):
         if self.mute['value'] == 0:
@@ -156,6 +178,9 @@ class FootController(object):
             return
         if self.bunk['value'] == 0:
             self.delay_change()
+        elif self.bunk['value'] == 1:
+            self.ts_change('on')
+            self.delay_change('on')
 
     def change_bunk(self):
         if self.bunk['value'] == 7:
