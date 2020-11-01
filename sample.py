@@ -52,7 +52,7 @@ class FootController(object):
         }
 
         self.amp = {
-            'value': 'twin reverb',
+            'value': 'jcm900',
             'jcm900': {
                 'led': self.red_led,
                 'sig': 0x00
