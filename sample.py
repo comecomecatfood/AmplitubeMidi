@@ -15,28 +15,36 @@ midiout, port_name = open_midioutput(1)
 class FootController(object):
     def __init__(self):
         self.power_led = LED(6)
-        green_led = LED(17)
-        blue_led = LED(27)
-        yellow_led = LED(22)
-        red_led = LED(24)
+        self.green_led = LED(17)
+        self.blue_led = LED(27)
+        self.yellow_led = LED(22)
+        self.red_led = LED(24)
 
         self.moller = {
-            'led': green_led,
+            'led': self.green_led,
             # value 100 is off
             'value': 100,
             'sig': 0x52,
         }
 
         self.ts = {
-            'led': blue_led,
+            'led': self.blue_led,
             # value 100 is off
             'value': 100,
+            'sig': 0x50,
         }
 
         self.delay = {
-            'led': yellow_led,
+            'led': self.yellow_led,
             # value 100 is off
             'value': 100,
+            'sig': 0x51,
+        }
+
+        self.mute = {
+            # value 100 is off
+            'value': 100,
+            'sig': 0x54,
         }
 
         self.bunk = {
@@ -44,9 +52,14 @@ class FootController(object):
         }
 
         self.amp = {
+            'value': 'twin reverb',
             'jcm900': {
-                'led': red_led,
-                'sig': 0x53
+                'led': self.red_led,
+                'sig': 0x00
+            },
+            'twin reverb': {
+                'led': self.red_led,
+                'sig': 0x01
             }
         }
         self.amp['jcm900']['led'].on()
@@ -59,12 +72,12 @@ class FootController(object):
         self.left_button.when_pressed = self.left_button_push
 
         self.other_button = Button(23)
-        self.other_button.when_pressed = self.change_bunk
+        self.other_button.when_pressed = self.mute_change
 
         self.power_led.on()
 
-    def ts_change(self):
-        if self.ts['value'] == 100:
+    def ts_change(self, on_off=''):
+        if on_off != 'off' and self.ts['value'] == 100:
             self.ts['led'].on()
             self.ts['value'] = 0
             print('TS ON')
@@ -72,11 +85,11 @@ class FootController(object):
             self.ts['led'].off()
             self.ts['value'] = 100
             print('TS OFF')
-        controller_change = [CONTROLLER_CHANGE, 0x50, self.ts['value']]
+        controller_change = [CONTROLLER_CHANGE, self.ts['sig'], self.ts['value']]
         midiout.send_message(controller_change)
 
-    def delay_change(self):
-        if self.delay['value'] == 100:
+    def delay_change(self, on_off=''):
+        if on_off != 'off' and self.delay['value'] == 100:
             self.delay['led'].on()
             self.delay['value'] = 0
             print('Delay ON')
@@ -84,11 +97,11 @@ class FootController(object):
             self.delay['led'].off()
             self.delay['value'] = 100
             print('Delay OFF')
-        controller_change = [CONTROLLER_CHANGE, 0x51, self.delay['value']]
+        controller_change = [CONTROLLER_CHANGE, self.delay['sig'], self.delay['value']]
         midiout.send_message(controller_change)
 
-    def moller_change(self):
-        if self.moller['value'] == 100:
+    def moller_change(self, on_off=''):
+        if on_off != 'off' and self.moller['value'] == 100:
             self.moller['led'].on()
             self.moller['value'] = 0
             print('Moller ON')
@@ -97,6 +110,31 @@ class FootController(object):
             self.moller['value'] = 100
             print('Moller OFF')
         controller_change = [CONTROLLER_CHANGE, self.moller['sig'], self.moller['value']]
+        midiout.send_message(controller_change)
+
+    def mute_change(self):
+        if self.mute['value'] == 100:
+            self.mute['value'] = 0
+            self.red_led.blink()
+            self.moller_change('off')
+            self.ts_change('off')
+            self.delay_change('off')
+            print('Mute ON')
+        else:
+            self.mute['value'] = 100
+            print('Mute OFF')
+            if self.bunk['value'] == 0:
+                self.moller_change('off')
+                self.ts_change('off')
+                self.delay_change('off')
+                # jcm900 ON
+                self.red_led.on()
+                if self.amp['value'] != 'jcm900':
+                    self.amp['value'] = 'jcm900'
+                    controller_change = [CONTROLLER_CHANGE, self.amp['jcm900']['sig'], 100]
+                    midiout.send_message(controller_change)
+
+        controller_change = [CONTROLLER_CHANGE, self.mute['sig'], self.mute['value']]
         midiout.send_message(controller_change)
 
     def right_button_push(self):
