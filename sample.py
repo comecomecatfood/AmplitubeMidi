@@ -138,14 +138,20 @@ class FootController(object):
         midiout.send_message(controller_change)
 
     def right_button_push(self):
+        if self.mute['value'] == 0:
+            return
         if self.bunk['value'] == 0:
             self.moller_change()
 
     def center_button_push(self):
+        if self.mute['value'] == 0:
+            return
         if self.bunk['value'] == 0:
             self.ts_change()
 
     def left_button_push(self):
+        if self.mute['value'] == 0:
+            return
         if self.bunk['value'] == 0:
             self.delay_change()
 
