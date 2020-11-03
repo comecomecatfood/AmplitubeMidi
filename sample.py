@@ -19,6 +19,7 @@ class FootController(object):
         self.blue_led = LED(27)
         self.yellow_led = LED(22)
         self.red_led = LED(24)
+        self.white_led = LED(25)
 
         self.moller = {
             'led': self.green_led,
@@ -58,7 +59,7 @@ class FootController(object):
                 'sig': 0x00
             },
             'twin reverb': {
-                'led': self.red_led,
+                'led': self.white_led,
                 'sig': 0x01
             }
         }
