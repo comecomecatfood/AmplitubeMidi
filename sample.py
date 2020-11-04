@@ -166,6 +166,7 @@ class FootController(object):
 
     def center_button_push(self):
         if self.mute['value'] == 0:
+            self.decrement_bunk()
             return
         if self.bunk['value'] == 0:
             self.ts_change()
@@ -175,7 +176,7 @@ class FootController(object):
 
     def left_button_push(self):
         if self.mute['value'] == 0:
-            self.change_bunk()
+            self.increment_bunk()
             return
         if self.bunk['value'] == 0:
             self.delay_change()
@@ -183,13 +184,22 @@ class FootController(object):
             self.ts_change('on')
             self.delay_change('on')
 
-    def change_bunk(self):
+    def increment_bunk(self):
         if self.bunk['value'] == 7:
             self.bunk['value'] = 0
         else:
             self.bunk['value'] += 1
         print('Bunk Change: Number {}'.format(self.bunk['value']))
         self.bunk_status()
+
+    def decrement_bunk(self):
+        if self.bunk['value'] == 0:
+            self.bunk['value'] = 7
+        else:
+            self.bunk['value'] -= 1
+        print('Bunk Change: Number {}'.format(self.bunk['value']))
+        self.bunk_status()
+
 
     def bunk_status(self):
         if self.bunk['value'] == 0:
